@@ -1,0 +1,23 @@
+{
+  "name": "browserify-seed-project",
+  "version": "1.0.0",
+  "description": "A seed project setup with watchify",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "browserify": "watchify ./app/scripts/src/main.js -v -t [ babelify --presets [ es2015 ] ] -o ./app/scripts/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://www.github.com/wytrych/canvas-gol"
+  },
+  "author": "Marcin Wolniewicz",
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "6.5.2",
+    "babel-preset-es2015": "6.16.0",
+    "babelify": "7.3.0",
+    "browserify": "13.1.0",
+    "watchify": "3.7.0"
+  }
+}
