@@ -1,7 +1,7 @@
 {
-  "name": "browserify-seed-project",
+  "name": "world-water-viz",
   "version": "1.0.0",
-  "description": "A seed project setup with watchify",
+  "description": "A world water usage visualisation",
   "main": "index.js",
   "scripts": {
     "test": "npm test",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://www.github.com/wytrych/canvas-gol"
+    "url": "http://www.github.com/wytrych/world-water-viz"
   },
   "author": "Marcin Wolniewicz",
   "license": "MIT",
@@ -19,5 +19,8 @@
     "babelify": "7.3.0",
     "browserify": "13.1.0",
     "watchify": "3.7.0"
+  },
+  "dependencies": {
+    "d3": "4.2.7"
   }
 }
