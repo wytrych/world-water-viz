@@ -17,7 +17,7 @@ const height = 500 - margin.top - margin.bottom
 const centerX = width / 2;
 const centerY = height / 2;
 
-const positioningCircleRadius = 150;
+const positioningRingRadius = 150;
 const textGap = 50;
 const singleCircleRadius = 20;
 
@@ -38,8 +38,8 @@ const enterSelection = root.selectAll('circle')
 
 enterSelection
     .append('circle')
-        .attr('cx', xScale(positioningCircleRadius))
-        .attr('cy', yScale(positioningCircleRadius))
+        .attr('cx', xScale(positioningRingRadius))
+        .attr('cy', yScale(positioningRingRadius))
         .attr('r', singleCircleRadius)
         .attr('id', (d, i) => i)
         .on('mouseover', function (d, i) {
@@ -52,6 +52,6 @@ enterSelection
 enterSelection
     .append('text')
     .text('Some text')
-    .attr('x', xScale(positioningCircleRadius + textGap))
-    .attr('y', yScale(positioningCircleRadius + textGap))
+    .attr('x', xScale(positioningRingRadius + textGap))
+    .attr('y', yScale(positioningRingRadius + textGap))
     .attr('class', (d, i) => `text-${i}`)
