@@ -4,6 +4,11 @@ const numOfElements = 20
 
 const data = d3.range(numOfElements).map((d) => d / numOfElements)
 
+const cssClasses = {
+    circleClass: 'country',
+    countryTip: 'tip'
+};
+
 const margin = {
     top: 20,
     bottom: 20,
@@ -20,6 +25,8 @@ const centerY = height / 2;
 const positioningRingRadius = 150;
 const textGap = 50;
 const singleCircleRadius = 20;
+
+let stopScroll = false;
 
 const xScale = (radius) =>
     (d, i) => centerX + Math.sin(d * 2 * Math.PI) * radius
@@ -41,17 +48,48 @@ enterSelection
         .attr('cx', xScale(positioningRingRadius))
         .attr('cy', yScale(positioningRingRadius))
         .attr('r', singleCircleRadius)
+        .attr('class', cssClasses.circleClass)
         .attr('id', (d, i) => i)
-        .on('mouseover', function (d, i) {
-            d3.select(`.text-${i}`).classed('show', true);
-        })
-        .on('mouseout', function (d, i) {
-            d3.select(`.text-${i}`).classed('show', false);
-        })
 
 enterSelection
     .append('text')
     .text('Some text')
     .attr('x', xScale(positioningRingRadius + textGap))
     .attr('y', yScale(positioningRingRadius + textGap))
-    .attr('class', (d, i) => `text-${i}`)
+    .attr('class', (d, i) => `${cssClasses.countryTip} text-${i}`)
+
+const findElement = function (event) {
+    const x = event.touches[0].clientX
+    const y = event.touches[0].clientY
+
+    const element = document.elementFromPoint(x, y)
+
+    return {
+        id: element.id,
+        isCountryCircle: element.classList.contains(cssClasses.circleClass)
+    }
+}
+
+window.addEventListener('touchstart', (e) => {
+    const element = findElement(e)
+    if (element.isCountryCircle)
+        stopScroll = true
+})
+
+window.addEventListener('touchend', () => {
+    stopScroll = false
+})
+
+window.addEventListener('touchmove', (e) => {
+    if (stopScroll)
+        e.preventDefault()
+
+    const element = findElement(e)
+
+    if (element.isCountryCircle) {
+        const id = element.id
+        d3.select(`.text-${id}`).classed('show', true)
+    } else {
+        d3.selectAll('.' + cssClasses.countryTip).classed('show', false)
+    }
+});
