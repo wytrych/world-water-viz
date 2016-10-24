@@ -1,5 +1,7 @@
 import * as d3 from 'd3'
 
+import CountrySelectorManager from './country-selector-manager';
+
 const numOfElements = 20
 
 const data = d3.range(numOfElements).map((d) => d / numOfElements)
@@ -25,8 +27,6 @@ const centerY = height / 2;
 const positioningRingRadius = 150;
 const textGap = 50;
 const singleCircleRadius = 20;
-
-let stopScroll = false;
 
 const xScale = (radius) =>
     (d, i) => centerX + Math.sin(d * 2 * Math.PI) * radius
@@ -58,38 +58,13 @@ enterSelection
     .attr('y', yScale(positioningRingRadius + textGap))
     .attr('class', (d, i) => `${cssClasses.countryTip} text-${i}`)
 
-const findElement = function (event) {
-    const x = event.touches[0].clientX
-    const y = event.touches[0].clientY
-
-    const element = document.elementFromPoint(x, y)
-
-    return {
-        id: element.id,
-        isCountryCircle: element.classList.contains(cssClasses.circleClass)
-    }
+const hideAllLabels = function () {
+    d3.selectAll('.' + cssClasses.countryTip).classed('show', false)
 }
 
-window.addEventListener('touchstart', (e) => {
-    const element = findElement(e)
-    if (element.isCountryCircle)
-        stopScroll = true
-})
+const showLabel = function (id) {
+    d3.select(`.text-${id}`).classed('show', true)
+}
 
-window.addEventListener('touchend', () => {
-    stopScroll = false
-})
-
-window.addEventListener('touchmove', (e) => {
-    if (stopScroll)
-        e.preventDefault()
-
-    const element = findElement(e)
-
-    if (element.isCountryCircle) {
-        const id = element.id
-        d3.select(`.text-${id}`).classed('show', true)
-    } else {
-        d3.selectAll('.' + cssClasses.countryTip).classed('show', false)
-    }
-});
+const countryManager = new CountrySelectorManager(hideAllLabels, showLabel, cssClasses.circleClass);
+countryManager.startHandlers();
