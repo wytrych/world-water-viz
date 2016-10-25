@@ -51,15 +51,16 @@ export class CountrySelectorManager {
     }
 
     findMouseElement (event) {
-        const x = event.clientX
-        const y = event.clientY
-
-        return this.calculateElement(x, y)
+        return this.findElement(event);
     }
 
     findTouchElement (event) {
-        const x = event.touches[0].clientX
-        const y = event.touches[0].clientY
+        return this.findElement(event.touches[0])
+    }
+
+    findElement (event) {
+        const x = event.clientX
+        const y = event.clientY
 
         return this.calculateElement(x, y)
     }
