@@ -1,4 +1,4 @@
-import throttle from 'lodash/throttle';
+import throttle from 'lodash/throttle'
 
 export class CountrySelectorManager {
 
@@ -68,7 +68,7 @@ export class CountrySelectorManager {
 
         return {
             id: element.id,
-            isCountryCircle: element.classList.contains(this.circleClass)
+            isCountryCircle: element.classList.contains(this.circleClass),
         }
     }
 
