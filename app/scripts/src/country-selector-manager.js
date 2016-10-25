@@ -8,8 +8,6 @@ export class CountrySelectorManager {
         this.clearLabels = clearLabels
         this.showLabel = showLabel
         this.circleClass = circleClass
-
-        this.startHandlers()
     }
 
     startHandlers () {
@@ -44,8 +42,8 @@ export class CountrySelectorManager {
     }
 
     mousemoveHandler () {
-        window.addEventListener('mousemove', throttle((e) => {
-            const element = this.findMouseElement(e)
+        window.addEventListener('mousemove', throttle((event) => {
+            const element = this.findMouseElement(event)
             this.toggleTextVisibility(element)
         }, this.moveEventThrottle))
     }
