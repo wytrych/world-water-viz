@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 
 import CountrySelectorManager from './country-selector-manager'
 
-const numOfElements = 20
+const numOfElements = 200
 
 const data = d3.range(numOfElements).map((d) => d / numOfElements)
 
@@ -10,6 +10,8 @@ const cssClasses = {
     circleClass: 'country',
     countryTip: 'tip',
 };
+
+const SCALE_SEPARATION = 3.5;
 
 const margin = {
     top: 20,
@@ -24,9 +26,11 @@ const height = 500 - margin.top - margin.bottom
 const centerX = width / 2
 const centerY = height / 2
 
-const positioningRingRadius = 150
+const positioningRingRadius = 180
 const textGap = 50
-const singleCircleRadius = 10
+const singleCircleRadius = function (d, i) {
+    return 2 + i * (5 / numOfElements)
+}
 
 const xScale = (radius) =>
     (d, i) => centerX - Math.sin(d * 2 * Math.PI) * radius
@@ -49,6 +53,7 @@ const draw = function (data, xScale, yScale) {
 
     realEnter
         .append('circle')
+        .attr('style', (d, i) => `fill:${d3.interpolateRainbow(i / numOfElements)}`)
         .transition(t)
         .attr('cx', xScale)
         .attr('cy', yScale)
@@ -88,7 +93,7 @@ drawStuff()
 let toggle = true;
 const toggleScale = function () {
     if (toggle)
-        draw(data, (d, i) => i * 40, height - 30)
+        draw(data, (d, i) => i * SCALE_SEPARATION, height - 30)
     else
         drawStuff()
 
