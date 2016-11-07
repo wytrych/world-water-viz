@@ -28,8 +28,9 @@ const centerY = height / 2
 
 const positioningRingRadius = 180
 const textGap = 50
+const r = 5000;
 const singleCircleRadius = function (d, i) {
-    return 2 + i * (5 / numOfElements)
+    return 2 + 1 * (r / numOfElements)
 }
 
 const xScale = (radius) =>
@@ -45,7 +46,6 @@ const root = d3.select('#container').append('svg')
 
 const draw = function (data, xScale, yScale) {
     const t = d3.transition().duration(750)
-    console.log(data);
     const enterSelection = root.selectAll('circle')
         .data(data)
 
@@ -104,10 +104,16 @@ const hideAllLabels = function () {
     d3.selectAll('.' + cssClasses.countryTip).classed('show', false)
 }
 
-const showLabel = function (id) {
-    console.log(id);
-    const el = d3.selectAll(`.text-${id}`)
-    console.log(el.node());
+const showLabel = function (element) {
+    d3.selectAll('circle.country.chosen')
+        .classed('chosen', false)
+        .classed('fade-out', true)
+
+    d3.select(element)
+        .classed('chosen', true)
+        .classed('fade-out', false)
+
+    const el = d3.selectAll(`.text-${element.id}`)
     el.classed('show', true)
 }
 

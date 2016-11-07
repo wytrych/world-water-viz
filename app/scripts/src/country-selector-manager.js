@@ -20,7 +20,7 @@ export class CountrySelectorManager {
     touchstartHandler () {
         window.addEventListener('touchstart', (e) => {
             const element = this.findTouchElement(e)
-            if (element.isCountryCircle)
+            if (element.classList.contains(this.circleClass))
                 this.stopScroll = true
         })
     }
@@ -64,19 +64,14 @@ export class CountrySelectorManager {
     }
 
     calculateElement (x, y) {
-        const element = document.elementFromPoint(x, y)
-
-        return {
-            id: element.id,
-            isCountryCircle: element.classList.contains(this.circleClass),
-        }
+        return document.elementFromPoint(x, y)
     }
 
     toggleTextVisibility (element) {
         this.clearLabels()
 
-        if (element.isCountryCircle)
-            this.showLabel(element.id)
+        if (element.classList.contains(this.circleClass))
+            this.showLabel(element)
     }
 }
 
