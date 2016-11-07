@@ -63,9 +63,9 @@ const draw = function (data, xScale, yScale) {
 
     realEnter
         .append('text')
-        .text('Some text')
-        .attr('x', xScale)
-        .attr('y', yScale)
+        .text((d, i) => `${i} ${d}`)
+        .attr('x', width / 2)
+        .attr('y', height / 2)
         .attr('class', (d, i) => `${cssClasses.countryTip} text-${i}`)
 
     enterSelection
