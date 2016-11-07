@@ -16,6 +16,30 @@ text {
 text.show {
     visibility: visible;
 }
+
+circle {
+    opacity: 1;
+    stroke: black;
+    stroke-width: 5;
+    stroke-opacity: 0;
+    stroke: #FFFFC9;
+}
+
+circle.chosen {
+    stroke-opacity: 1;
+}
+
+circle.fade-out {
+    animation: 2s ease-out fade_out;
+}
+
+@keyframes fade_out {
+    from {
+        stroke-opacity: 1;
+    } to {
+        stroke-opacity: 0;
+    }
+}
         </style>
     </head>
     <body>
