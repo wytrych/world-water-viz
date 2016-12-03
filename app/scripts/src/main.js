@@ -45,13 +45,12 @@ const root = d3.select('#container').append('svg')
         .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
 const draw = function (data, xScale, yScale) {
-    const t = d3.transition().duration(750)
-    const enterSelection = root.selectAll('circle')
+    const dataSelection = root.selectAll('circle')
         .data(data)
 
-    const realEnter = enterSelection.enter()
+    const enterSelection = dataSelection.enter()
 
-    realEnter
+    enterSelection
         .append('circle')
         .attr('style', (d, i) => `fill:${d3.interpolateRainbow(i / numOfElements)}`)
         .transition(t)
@@ -61,14 +60,16 @@ const draw = function (data, xScale, yScale) {
         .attr('class', cssClasses.circleClass)
         .attr('id', (d, i) => i)
 
-    realEnter
+    enterSelection
         .append('text')
         .text((d, i) => `${i} ${d}`)
         .attr('x', width / 2)
         .attr('y', height / 2)
         .attr('class', (d, i) => `${cssClasses.countryTip} text-${i}`)
 
-    enterSelection
+    const t = d3.transition().duration(750)
+
+    dataSelection
         .transition(t)
         .attr('cx', xScale)
         .attr('cy', yScale)
@@ -76,26 +77,24 @@ const draw = function (data, xScale, yScale) {
         .attr('class', cssClasses.circleClass)
         .attr('id', (d, i) => i)
 
-    enterSelection
-        .append('text')
-        .text('Some text')
-        .attr('x', xScale)
-        .attr('y', yScale)
-        .attr('class', (d, i) => `${cssClasses.countryTip} text-${i}`)
 }
 
-const drawStuff = function (radius = 0) {
+const drawInCircle = function (radius = 0) {
     draw(data, xScale(positioningRingRadius + radius), yScale(positioningRingRadius + radius))
 }
 
-drawStuff()
+const drawInLine = function () {
+    draw(data, (d, i) => i * SCALE_SEPARATION, height - 30)
+}
+
+drawInCircle()
 
 let toggle = true;
 const toggleScale = function () {
     if (toggle)
-        draw(data, (d, i) => i * SCALE_SEPARATION, height - 30)
+        drawInLine()
     else
-        drawStuff()
+        drawInCircle()
 
     toggle = !toggle
 }
