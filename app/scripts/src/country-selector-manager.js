@@ -49,7 +49,7 @@ export class CountrySelectorManager {
     }
 
     findMouseElement (event) {
-        return this.findElement(event);
+        return this.findElement(event)
     }
 
     findTouchElement (event) {
@@ -75,4 +75,4 @@ export class CountrySelectorManager {
     }
 }
 
-export default CountrySelectorManager;
+export default CountrySelectorManager

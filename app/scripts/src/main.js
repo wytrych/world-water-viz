@@ -9,9 +9,7 @@ const data = d3.range(numOfElements).map((d) => d / numOfElements)
 const cssClasses = {
     circleClass: 'country',
     countryTip: 'tip',
-};
-
-const SCALE_SEPARATION = 3.5;
+}
 
 const margin = {
     top: 20,
@@ -23,28 +21,45 @@ const margin = {
 const width = 800 - margin.left - margin.right
 const height = 500 - margin.top - margin.bottom
 
-const centerX = width / 2
-const centerY = height / 2
-
-const positioningRingRadius = 180
-const textGap = 50
-const r = 5000;
-const singleCircleRadius = function (d, i) {
-    return 2 + 1 * (r / numOfElements)
-}
-
-const xScale = (radius) =>
-    (d, i) => centerX - Math.sin(d * 2 * Math.PI) * radius
-const yScale = (radius) =>
-    (d, i) => centerY - Math.cos(d * 2 * Math.PI) * radius
-
 const root = d3.select('#container').append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
         .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-const draw = function (data, xScale, yScale) {
+let toggle = true
+function toggleScale () {
+    if (toggle)
+        drawInLine()
+    else
+        drawInCircle()
+
+    toggle = !toggle
+}
+
+drawInCircle()
+
+function drawInCircle (radius = 0) {
+    const positioningRingRadius = 180
+    draw(data, createCircularXScale(positioningRingRadius + radius), createCircularYScale(positioningRingRadius + radius))
+}
+
+function drawInLine () {
+    const SCALE_SEPARATION = 3.5
+    draw(data, (d, i) => i * SCALE_SEPARATION, height - 30)
+}
+
+function createCircularXScale (radius) {
+    const centerX = width / 2
+    return (d, i) => centerX - Math.sin(d * 2 * Math.PI) * radius
+}
+
+function createCircularYScale (radius) {
+    const centerY = height / 2
+    return (d, i) => centerY - Math.cos(d * 2 * Math.PI) * radius
+}
+
+function draw (data, xScale, yScale) {
     const dataSelection = root.selectAll('circle')
         .data(data)
 
@@ -56,7 +71,7 @@ const draw = function (data, xScale, yScale) {
         .transition(t)
         .attr('cx', xScale)
         .attr('cy', yScale)
-        .attr('r', singleCircleRadius)
+        .attr('r', calculateRadius)
         .attr('class', cssClasses.circleClass)
         .attr('id', (d, i) => i)
 
@@ -73,37 +88,25 @@ const draw = function (data, xScale, yScale) {
         .transition(t)
         .attr('cx', xScale)
         .attr('cy', yScale)
-        .attr('r', singleCircleRadius)
+        .attr('r', calculateRadius)
         .attr('class', cssClasses.circleClass)
         .attr('id', (d, i) => i)
 
 }
 
-const drawInCircle = function (radius = 0) {
-    draw(data, xScale(positioningRingRadius + radius), yScale(positioningRingRadius + radius))
+function calculateRadius (d, i) {
+    const r = 30
+    return (i + 1) * (r / numOfElements)
 }
 
-const drawInLine = function () {
-    draw(data, (d, i) => i * SCALE_SEPARATION, height - 30)
-}
+const countryManager = new CountrySelectorManager(hideAllLabels, showLabel, cssClasses.circleClass)
+countryManager.startHandlers()
 
-drawInCircle()
-
-let toggle = true;
-const toggleScale = function () {
-    if (toggle)
-        drawInLine()
-    else
-        drawInCircle()
-
-    toggle = !toggle
-}
-
-const hideAllLabels = function () {
+function hideAllLabels () {
     d3.selectAll('.' + cssClasses.countryTip).classed('show', false)
 }
 
-const showLabel = function (element) {
+function showLabel (element) {
     d3.selectAll('circle.country.chosen')
         .classed('chosen', false)
         .classed('fade-out', true)
@@ -115,9 +118,6 @@ const showLabel = function (element) {
     const el = d3.selectAll(`.text-${element.id}`)
     el.classed('show', true)
 }
-
-const countryManager = new CountrySelectorManager(hideAllLabels, showLabel, cssClasses.circleClass)
-countryManager.startHandlers()
 
 root.append('circle')
     .attr('cx', 10)
