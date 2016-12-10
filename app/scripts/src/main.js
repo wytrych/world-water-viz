@@ -9,6 +9,8 @@ const data = d3.range(numOfElements).map((d) => d / numOfElements)
 const cssClasses = {
     circleClass: 'country',
     countryTip: 'tip',
+    circlePhantom: 'mask'
+
 }
 
 const margin = {
@@ -20,6 +22,8 @@ const margin = {
 
 const width = 800 - margin.left - margin.right
 const height = 500 - margin.top - margin.bottom
+
+const MAX_CIRCLE_RADIUS = 30
 
 const root = d3.select('#container').append('svg')
     .attr('width', width + margin.left + margin.right)
@@ -40,13 +44,31 @@ function toggleScale () {
 drawInCircle()
 
 function drawInCircle (radius = 0) {
+    function rotate (d, i) {
+        return -360 * (i / numOfElements)
+    }
+
     const positioningRingRadius = 180
-    draw(data, createCircularXScale(positioningRingRadius + radius), createCircularYScale(positioningRingRadius + radius))
+    draw(
+        data,
+        createCircularXScale(positioningRingRadius + radius),
+        createCircularYScale(positioningRingRadius + radius),
+        rotate,
+    )
 }
 
 function drawInLine () {
+    function rotate () {
+        return 0
+    }
+
     const SCALE_SEPARATION = 3.5
-    draw(data, (d, i) => i * SCALE_SEPARATION, height - 30)
+    draw(
+        data,
+        (d, i) => i * SCALE_SEPARATION,
+        () => height - 30,
+        rotate,
+    )
 }
 
 function createCircularXScale (radius) {
@@ -59,11 +81,18 @@ function createCircularYScale (radius) {
     return (d, i) => centerY - Math.cos(d * 2 * Math.PI) * radius
 }
 
-function draw (data, xScale, yScale) {
+function draw (data, xScale, yScale, rotateFn) {
+    const t = d3.transition().duration(750)
+
     const dataSelection = root.selectAll('circle')
         .data(data)
 
     const enterSelection = dataSelection.enter()
+
+    const masksSelection = root.selectAll('rect')
+        .data(data)
+
+    const masksEnterSelection = masksSelection.enter()
 
     enterSelection
         .append('circle')
@@ -73,7 +102,21 @@ function draw (data, xScale, yScale) {
         .attr('cy', yScale)
         .attr('r', calculateRadius)
         .attr('class', cssClasses.circleClass)
-        .attr('id', (d, i) => i)
+        .attr('id', (d, i) => `country-${i}`)
+
+    const RECT_HEIGHT = 55
+    const RECT_WIDTH = 5
+
+    masksEnterSelection
+        .append('rect')
+        .transition(t)
+        .attr('x', (d, i) => xScale(d, i) - RECT_WIDTH / 2)
+        .attr('y', (d, i) => yScale(d, i) - RECT_HEIGHT / 2)
+        .attr('transform', (d, i) => `rotate(${rotateFn(d, i)} ${xScale(d, i)} ${yScale(d, i)})`)
+        .attr('width', RECT_WIDTH)
+        .attr('height', RECT_HEIGHT)
+        .attr('class', cssClasses.circlePhantom)
+        .attr('data-target', (d, i) => i)
 
     enterSelection
         .append('text')
@@ -82,24 +125,31 @@ function draw (data, xScale, yScale) {
         .attr('y', height / 2)
         .attr('class', (d, i) => `${cssClasses.countryTip} text-${i}`)
 
-    const t = d3.transition().duration(750)
-
     dataSelection
         .transition(t)
         .attr('cx', xScale)
         .attr('cy', yScale)
         .attr('r', calculateRadius)
         .attr('class', cssClasses.circleClass)
-        .attr('id', (d, i) => i)
+        .attr('id', (d, i) => `country-${i}`)
+
+    masksSelection
+        .transition(t)
+        .attr('x', (d, i) => xScale(d, i) - RECT_WIDTH / 2)
+        .attr('y', (d, i) => yScale(d, i) - RECT_HEIGHT / 2)
+        .attr('transform', (d, i) => `rotate(${rotateFn(d, i)} ${xScale(d, i)} ${yScale(d, i)})`)
+        .attr('width', RECT_WIDTH)
+        .attr('height', RECT_HEIGHT)
+        .attr('class', cssClasses.circlePhantom)
+        .attr('data-target', (d, i) => i)
 
 }
 
 function calculateRadius (d, i) {
-    const r = 30
-    return (i + 1) * (r / numOfElements)
+    return (i + 1) * (MAX_CIRCLE_RADIUS / numOfElements)
 }
 
-const countryManager = new CountrySelectorManager(hideAllLabels, showLabel, cssClasses.circleClass)
+const countryManager = new CountrySelectorManager(hideAllLabels, showLabel, cssClasses.circlePhantom)
 countryManager.startHandlers()
 
 function hideAllLabels () {
@@ -107,16 +157,17 @@ function hideAllLabels () {
 }
 
 function showLabel (element) {
+    const targetId = element.getAttribute('data-target')
+    const el = d3.selectAll(`.text-${targetId}`)
+    el.classed('show', true)
+
     d3.selectAll('circle.country.chosen')
         .classed('chosen', false)
         .classed('fade-out', true)
 
-    d3.select(element)
+    d3.select(`#country-${targetId}`)
         .classed('chosen', true)
         .classed('fade-out', false)
-
-    const el = d3.selectAll(`.text-${element.id}`)
-    el.classed('show', true)
 }
 
 root.append('circle')
